@@ -370,7 +370,7 @@ module Ole # :nodoc:
 			end
 
 			def validate!
-				raise FormatError, "OLE2 signature is invalid" unless magic == MAGIC
+				raise FormatError, "OLE2 signature is invalid" unless magic.unpack('C*') == MAGIC.unpack('C*')
 				if num_bat == 0 or # is that valid for a completely empty file?
 					 # not sure about this one. basically to do max possible bat given size of mbat
 					 num_bat > 109 && num_bat > 109 + num_mbat * (1 << b_shift - 2) or
@@ -379,7 +379,7 @@ module Ole # :nodoc:
 					 # given the size of the header is 76, if b_shift <= 6, blocks address the header.
 					 s_shift > b_shift or b_shift <= 6 or b_shift >= 31 or
 					 # we only handle little endian
-					 byte_order != "\xfe\xff"
+					 byte_order.unpack('C*') != [0xfe, 0xff]
 					raise FormatError, "not valid OLE2 structured storage file"
 				end
 				# relaxed this, due to test-msg/qwerty_[1-3]*.msg they all had
